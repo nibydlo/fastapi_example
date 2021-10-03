@@ -5,6 +5,7 @@ from graphene import ObjectType, String, Field, Int, Schema
 from starlette.graphql import GraphQLApp
 
 RegionValueObject = namedtuple("Region", ["id", "name"])
+PlaceValueObject = namedtuple("Place", ["id", "name", "region"])
 
 
 class Region(ObjectType):
@@ -17,9 +18,13 @@ class Place(ObjectType):
     name = String()
     region = Field(Region)
 
-    def resolve_region(parent, info):
-        return RegionValueObject(id=1, name='Saint-Petersburg')
+
+class Query(ObjectType):
+    place = Field(Place)
+
+    def resolve_place(parent, info):
+        return PlaceValueObject(id=1, name='Palace square', region=RegionValueObject(id=1, name='Saint-Petersburg'))
 
 
 app = FastAPI()
-app.add_route("/", GraphQLApp(schema=Schema(query=Place)))
+app.add_route("/", GraphQLApp(schema=Schema(query=Query)))
