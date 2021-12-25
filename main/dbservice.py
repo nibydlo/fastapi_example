@@ -62,6 +62,10 @@ N_SAMPLE_PLACES = 100
 # ]
 
 
+class UnknownUserException(Exception):
+    pass
+
+
 def get_init_places_table_script():
     return INIT_PLACES_SCRIPT_TEMPLATE.format(','.join([' vec_{} REAL NOT NULL'.format(i) for i in range(VEC_SIZE)]))
 
@@ -170,6 +174,8 @@ class DatabaseService():
 
     def get_user_vector(self, uid: int) -> List[float]:
         user_row = self.get_user(uid)
+        if not user_row:
+            raise UnknownUserException
         return list(user_row[1:])
 
     def fill_places_table(self, n_places=N_SAMPLE_PLACES):
